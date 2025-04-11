@@ -1,0 +1,38 @@
+{
+  "images" : [
+    {
+      "filename" : "3C6CEB3A-848D-4B1C-9AB3-9430B53E9344_hipixel_4x_upscayl-standard-4x 1.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "3C6CEB3A-848D-4B1C-9AB3-9430B53E9344_hipixel_4x_upscayl-standard-4x 2.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "tinted"
+        }
+      ],
+      "filename" : "3C6CEB3A-848D-4B1C-9AB3-9430B53E9344_hipixel_4x_upscayl-standard-4x 3.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

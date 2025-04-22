@@ -23,7 +23,35 @@ struct ContentView: View {
                 ARViewContainer(viewModel: viewModel)
                     .edgesIgnoringSafeArea(.all)
                 
-                // Status and controls overlay
+                // Move-closer prompt
+                if viewModel.showMoveCloserPrompt {
+                    Spacer()
+                    VStack {
+                        if let distance = viewModel.currentHandDistance {
+                            Text(String(format: "Your hand is %.2f m away. Please move closer.", distance))
+                                .font(.headline)
+                                .padding()
+                                .background(Color.black.opacity(0.7))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .padding(.top, 60)
+                        } else {
+                            Text("Your hand may be too far away. Please move closer.")
+                                .font(.headline)
+                                .padding()
+                                .background(Color.black.opacity(0.7))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .padding(.top, 60)
+                        }
+                        
+                    }
+                    .zIndex(1)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .animation(.easeInOut, value: viewModel.showMoveCloserPrompt)
+                }
+                
+                // Main overlays and status
                 VStack {
                     // Back button
                     HStack {

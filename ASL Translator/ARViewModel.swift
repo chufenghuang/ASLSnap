@@ -96,6 +96,9 @@ class ARViewModel: NSObject, ObservableObject, ARSCNViewDelegate, ARSessionDeleg
     @Published var handPositions: [HandPosition] = []
     @Published var textNodes: [TextNode] = []
     
+    // Current hand distance in meters (z depth), used in prompt
+    @Published var currentHandDistance: Float? = nil
+    
     // Create a Vision request to detect one hand.
     private lazy var handPoseRequest: VNDetectHumanHandPoseRequest = {
         let request = VNDetectHumanHandPoseRequest()
@@ -108,6 +111,12 @@ class ARViewModel: NSObject, ObservableObject, ARSCNViewDelegate, ARSessionDeleg
     
     // Track current camera position
     @Published var isFrontCameraActive = false
+    
+    // Threshold distance (meters) beyond which we ask the user to move closer
+    private let distanceThreshold: Float = 0.2
+
+    // Published property to show a move-closer prompt
+    @Published var showMoveCloserPrompt: Bool = false
     
     /// Called by ARViewContainer after creating the ARSCNView.
     func setupScene(in sceneView: ARSCNView) {
@@ -124,14 +133,6 @@ class ARViewModel: NSObject, ObservableObject, ARSCNViewDelegate, ARSessionDeleg
         // Create an empty scene for ARSCNView.
         let scene = SCNScene()
         sceneView.scene = scene
-        
-//        // Create a node to highlight the hand
-//        handHighlightNode = createHandHighlightNode()
-//        if let node = handHighlightNode {
-//            scene.rootNode.addChildNode(node)
-//            // Always hide the highlight - we don't want to show it
-//            node.isHidden = true
-//        }
         
         // Create and add the hello text node
         helloTextNode = createHelloTextNode()
@@ -244,6 +245,18 @@ class ARViewModel: NSObject, ObservableObject, ARSCNViewDelegate, ARSessionDeleg
                             
                             // Update the highlight node on main thread
                             DispatchQueue.main.async {
+                                // Compute hand distance and store for UI
+                                let handDistance = abs(position.z)
+                                self.currentHandDistance = handDistance
+                                // Show prompt if too far
+                                self.showMoveCloserPrompt = handDistance > self.distanceThreshold
+                                if self.showMoveCloserPrompt {
+                                    // Hide bubble when too far
+                                    self.helloTextNode?.isHidden = true
+                                    // Skip bubble placement
+                                    return
+                                }
+
                                 // If previously not detected, we're newly detecting a hand
                                 let wasNotDetected = !self.isHandDetected
                                 
@@ -344,6 +357,8 @@ class ARViewModel: NSObject, ObservableObject, ARSCNViewDelegate, ARSessionDeleg
                         
                         // Reset bubble positioning flag so next detection will place a new bubble
                         self.isBubblePositioned = false
+                        self.showMoveCloserPrompt = false
+                        self.currentHandDistance = nil
                     }
                 }
             } catch {

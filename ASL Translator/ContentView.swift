@@ -5,9 +5,10 @@
 //  Created by Chufeng Huang on 4/7/25.
 //
 
-import Foundation
 import SwiftUI
-import ARKit
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct ContentView: View {
     // Create the ARViewModel as a @StateObject
@@ -22,42 +23,12 @@ struct ContentView: View {
             ZStack {
                 ARViewContainer(viewModel: viewModel)
                     .edgesIgnoringSafeArea(.all)
-                
-                // Move-closer prompt
-                if viewModel.showMoveCloserPrompt {
-                    Spacer()
-                    VStack {
-                        if let distance = viewModel.currentHandDistance {
-                            Text(String(format: "Your hand is %.2f m away. Please move closer.", distance))
-                                .font(.headline)
-                                .padding()
-                                .background(Color.black.opacity(0.7))
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                                .padding(.top, 60)
-                        } else {
-                            Text("Your hand may be too far away. Please move closer.")
-                                .font(.headline)
-                                .padding()
-                                .background(Color.black.opacity(0.7))
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                                .padding(.top, 60)
-                        }
-                        
-                    }
-                    .zIndex(1)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .animation(.easeInOut, value: viewModel.showMoveCloserPrompt)
-                }
-                
-                // Main overlays and status
+
+                // Overlay controls: Back + Place buttons
                 VStack {
-                    // Back button
                     HStack {
-                        Button(action: {
-                            showARView = false
-                        }) {
+                        // Back button
+                        Button(action: { showARView = false }) {
                             Image(systemName: "arrow.left.circle.fill")
                                 .font(.system(size: 30))
                                 .foregroundColor(.white)
@@ -65,27 +36,21 @@ struct ContentView: View {
                                 .background(Color.black.opacity(0.5))
                                 .clipShape(Circle())
                         }
-                        .padding(.leading, 20)
-                        .padding(.top, 20)
-                        
                         Spacer()
+                        // Place window button
+                        Button(action: { viewModel.placeWindowAtCenter() }) {
+                            Image(systemName: "square.and.arrow.down.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.white)
+                                .padding(20)
+                                .background(Color.blue.opacity(0.6))
+                                .clipShape(Circle())
+                        }
                     }
-                    
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                     Spacer()
-                    
-                    // Hand detection status at the bottom
-                    HStack {
-                        Spacer()
-                        Text(viewModel.isHandDetected ? "Hand Detected" : "No Hand")
-                            .padding(8)
-                            .background(viewModel.isHandDetected ? Color.green.opacity(0.7) : Color.red.opacity(0.7))
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                            .padding(.trailing, 20)
-                            .padding(.bottom, 30)
-                    }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .ignoresSafeArea()
             .onAppear {
